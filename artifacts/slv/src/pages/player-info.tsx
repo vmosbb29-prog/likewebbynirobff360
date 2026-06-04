@@ -8,6 +8,7 @@ interface BasicInfo {
   level?: number;
   region?: string;
   likes?: number;
+  liked?: number;
   seasonId?: number;
   creditScore?: number;
   title?: string;
@@ -149,7 +150,7 @@ export default function PlayerInfo() {
             <div className="card-glass rounded-xl p-3 text-center">
               <Heart size={16} className="mx-auto text-pink-400 mb-1" />
               <p className="text-xs text-slate-500">Likes</p>
-              <p className="text-xl font-bold text-pink-400">{basic.likes?.toLocaleString() ?? "—"}</p>
+              <p className="text-xl font-bold text-pink-400">{(basic.likes ?? basic.liked)?.toLocaleString() ?? "—"}</p>
             </div>
             <div className="card-glass rounded-xl p-3 text-center">
               <Shield size={16} className="mx-auto text-blue-400 mb-1" />
@@ -171,7 +172,7 @@ export default function PlayerInfo() {
             <InfoRow label="UID" value={basic.accountId ?? uid} color="text-blue-300 font-mono" />
             <InfoRow label="Level" value={basic.level} color="text-amber-400" />
             <InfoRow label="Region" value={basic.region} />
-            <InfoRow label="Likes" value={basic.likes?.toLocaleString()} color="text-pink-400" />
+            <InfoRow label="Likes" value={(basic.likes ?? basic.liked)?.toLocaleString()} color="text-pink-400" />
             <InfoRow label="Title" value={basic.title} />
             <InfoRow label="Season" value={basic.seasonId} />
             {data.socialInfo?.signature && <InfoRow label="Bio" value={data.socialInfo.signature} />}

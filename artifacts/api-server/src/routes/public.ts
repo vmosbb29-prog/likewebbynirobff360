@@ -317,12 +317,13 @@ router.post("/giveaway-like", async (req, res) => {
     return;
   }
 
-  if (!settings.likeApiUrl) {
+  const effectiveApiUrl = settings.likeApiUrl || settings.autoLikeApiUrl;
+  if (!effectiveApiUrl) {
     res.status(503).json({ message: "Like API not configured" });
     return;
   }
 
-  const apiUrl = settings.likeApiUrl.replace("{uid}", uid).replace("{region}", region).replace("{server_name}", region);
+  const apiUrl = effectiveApiUrl.replace("{uid}", uid).replace("{region}", region).replace("{server_name}", region);
 
   try {
     const controller = new AbortController();
@@ -367,7 +368,16 @@ router.get("/player-info", async (req, res) => {
       res.status(apiRes.status).json({ message: "Player not found" });
       return;
     }
-    const json = await apiRes.json();
+    const json = await apiRes.json() as Record<string, unknown>;
+
+    // Normalize likes field — Free Fire APIs use 'liked' not 'likes'
+    if (json.basicInfo && typeof json.basicInfo === "object") {
+      const bi = json.basicInfo as Record<string, unknown>;
+      if (bi.liked != null && bi.likes == null) {
+        bi.likes = bi.liked;
+      }
+    }
+
     res.json(json);
   } catch (err) {
     logger.error({ err }, "Player info API error");
